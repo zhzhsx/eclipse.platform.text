@@ -322,12 +322,12 @@ public class ContentAssistant implements IContentAssistant, IContentAssistantExt
 			if (e.character != 0 && (e.stateMask == SWT.ALT))
 				return;
 
-			// Only act on characters that are trigger candidates. This
-			// avoids computing the model selection on every keystroke
-			if (computeAllAutoActivationTriggers().indexOf(e.character) < 0) {
-				stop();
-				return;
-			}
+//			// Only act on characters that are trigger candidates. This
+//			// avoids computing the model selection on every keystroke
+//			if (computeAllAutoActivationTriggers().indexOf(e.character) < 0) {
+//				stop();
+//				return;
+//			}
 
 			int showStyle;
 			int pos= fContentAssistSubjectControlAdapter.getSelectedRange().x;
@@ -335,13 +335,27 @@ public class ContentAssistant implements IContentAssistant, IContentAssistantExt
 
 			activation= fContentAssistSubjectControlAdapter.getCompletionProposalAutoActivationCharacters(ContentAssistant.this, pos);
 
+			char previousChar = ' ';
+			try {
+				previousChar = fContentAssistSubjectControlAdapter.getDocument().getChar(pos - 1);
+			} catch (BadLocationException e1) {
+			}
+
 			if (contains(activation, e.character) && !isProposalPopupActive())
 				showStyle= SHOW_PROPOSALS;
-			else {
+			else if (!Character.isJavaIdentifierPart(previousChar) &&
+					Character.isJavaIdentifierStart(e.character) && !isProposalPopupActive()) {
+				showStyle = SHOW_PROPOSALS;
+			} else {
 				activation= fContentAssistSubjectControlAdapter.getContextInformationAutoActivationCharacters(ContentAssistant.this, pos);
 				if (contains(activation, e.character) && !isContextInfoPopupActive())
 					showStyle= SHOW_CONTEXT_INFO;
 				else {
+					// typing following char would not stop the proposal which was
+					// started by typing first letter
+					if (Character.isJavaIdentifierPart(previousChar)) {
+						return;
+					}
 					stop();
 					return;
 				}
