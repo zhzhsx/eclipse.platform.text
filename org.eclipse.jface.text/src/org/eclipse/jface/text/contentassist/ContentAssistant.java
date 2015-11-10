@@ -336,15 +336,17 @@ public class ContentAssistant implements IContentAssistant, IContentAssistantExt
 			activation= fContentAssistSubjectControlAdapter.getCompletionProposalAutoActivationCharacters(ContentAssistant.this, pos);
 
 			char previousChar= ' ';
+			String contentType = null;
 			try {
 				if (pos > 0)
 					previousChar= fContentAssistSubjectControlAdapter.getDocument().getChar(pos - 1);
+				contentType= TextUtilities.getContentType(fContentAssistSubjectControlAdapter.getDocument(), getDocumentPartitioning(), pos, true);
 			} catch (BadLocationException e1) {
 			}
 
 			if (contains(activation, e.character) && !isProposalPopupActive())
 				showStyle= SHOW_PROPOSALS;
-			else if (!Character.isJavaIdentifierPart(previousChar) &&
+			else if (IDocument.DEFAULT_CONTENT_TYPE.equals(contentType) && !Character.isJavaIdentifierPart(previousChar) &&
 					Character.isJavaIdentifierStart(e.character) && !isProposalPopupActive()) {
 				showStyle = SHOW_PROPOSALS;
 			} else {
