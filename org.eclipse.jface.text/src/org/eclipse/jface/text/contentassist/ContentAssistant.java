@@ -335,9 +335,10 @@ public class ContentAssistant implements IContentAssistant, IContentAssistantExt
 
 			activation= fContentAssistSubjectControlAdapter.getCompletionProposalAutoActivationCharacters(ContentAssistant.this, pos);
 
-			char previousChar = ' ';
+			char previousChar= ' ';
 			try {
-				previousChar = fContentAssistSubjectControlAdapter.getDocument().getChar(pos - 1);
+				if (pos > 0)
+					previousChar= fContentAssistSubjectControlAdapter.getDocument().getChar(pos - 1);
 			} catch (BadLocationException e1) {
 			}
 
